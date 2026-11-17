@@ -1,0 +1,6 @@
+tasks/**/.*.tmp
+node_modules/
+dist/
+*.tgz
+logs/
+.playwright-mcp/
