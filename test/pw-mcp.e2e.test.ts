@@ -64,7 +64,12 @@ beforeAll(async () => {
   cwd = mkdtempSync(join(tmpdir(), 'css-snapshot-mcp-'));
   const transport = new StdioClientTransport({
     command: process.execPath,
-    args: [join(root, 'node_modules/@playwright/mcp/cli.js'), '--headless', '--isolated', '--executable-path', chromium.executablePath()],
+    args: [
+      join(root, 'node_modules/@playwright/mcp/cli.js'), '--headless', '--isolated', '--executable-path', chromium.executablePath(),
+      // Ubuntu runners forbid unprivileged user namespaces, so Chromium's sandbox aborts there
+      // (playwright's own launch disables it on Linux by default; the MCP keeps it on).
+      ...(process.platform === 'linux' ? ['--no-sandbox'] : []),
+    ],
     cwd,
     stderr: 'pipe',
   });

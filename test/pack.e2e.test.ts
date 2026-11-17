@@ -67,13 +67,17 @@ describe('packed tarball', () => {
 import { extractCss as overCdp, reworkStyles, jsonToHtml, type SelfContainedStyles, type OpenSession } from 'css-snapshot';
 import { extractCss, type PageLike } from 'css-snapshot/playwright';
 import { diffStyles, canonicalStyleJson } from 'css-snapshot/diff';
-import { expandShorthand, INHERITABLE } from 'css-snapshot/css';
+import { expandShorthand, INHERITABLE, orderPropsShorthandFirst } from 'css-snapshot/css';
+import { matcherMode } from 'css-snapshot';
 import { pwMcpLoader } from 'css-snapshot/pw-mcp';
 import type { Page } from 'playwright';
 export async function f(page: Page, open: OpenSession): Promise<string> {
   const a: SelfContainedStyles = await extractCss(page satisfies PageLike, '.c');
   const b = await overCdp(open, '.c');
   void reworkStyles; void canonicalStyleJson; void expandShorthand; void INHERITABLE;
+  const m: 'probe' | 'cdp' = matcherMode();
+  const order: string[] = orderPropsShorthandFirst([['margin-top', '1px'], ['margin', '0']]);
+  void m; void order;
   return jsonToHtml(a) + JSON.stringify(diffStyles(a, b)) + pwMcpLoader();
 }
 `);

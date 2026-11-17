@@ -35,6 +35,7 @@ async function withPage<R>(openSession: OpenSession, run: (page: CdpPage) => Pro
 
 export { CdpConnection, CdpPage, CdpSession, attach, browserWsUrl, type OpenSession } from './cdp.ts';
 export {
+  matcherMode,
   reworkStyles,
   reworkHtml,
   jsonToHtml,
