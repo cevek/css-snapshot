@@ -7,11 +7,12 @@ import { promisify } from 'node:util';
 import { mkdtempSync, rmSync, writeFileSync, readFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { createServer } from 'node:net';
 import { chromium, type Browser } from 'playwright';
 import { servePages } from './util/server.ts';
 
-const root = new URL('..', import.meta.url).pathname;
+const root = fileURLToPath(new URL('..', import.meta.url));
 const PAGE = `<!doctype html><style>.c{padding:0 4px;color:#333}.c:hover{color:red}</style><div class="c" id="c"><b>hi</b></div>`;
 
 let dir: string;

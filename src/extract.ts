@@ -74,6 +74,10 @@ const DEFAULT_STATES = ['hover', 'focus', 'focus-visible', 'active', 'disabled']
 // risk flag, a build failure, or a mode it can't serve (frame). Override with
 // the `matcher` option or env `CSS_SNAPSHOT_MATCHER=probe|cdp`. See ARCHITECTURE.md §10.
 const DEFAULT_MATCHER: 'probe' | 'cdp' = 'probe';
+
+/** Same-process frame mode stamps the frame's <html> with this attribute (+ a sequence
+ *  number) to find its document in the pierced snapshot; it never reaches the output. */
+export const FRAME_STAMP_PREFIX = 'data-css-snapshot-frame-';
 /** The active author-cascade matcher: env `CSS_SNAPSHOT_MATCHER` override, else the
  *  build default. Exported so the baseline capture + the guard/differential tests
  *  select the same matcher (and its path-specific baseline) as the extraction. */
@@ -898,7 +902,7 @@ async function buildReworkModel(page: ExtractionPage, states: string[], doPseudo
       // on the target frame's <html> via `frame.evaluate` (which runs in exactly
       // that frame regardless of session), then `pierce` the page snapshot and
       // find the content document carrying the stamp — that is our `root`.
-      const attr = `data-css-snapshot-frame-${++frameStampSeq}`;
+      const attr = `${FRAME_STAMP_PREFIX}${++frameStampSeq}`;
       await frame!.evaluate((a) => document.documentElement.setAttribute(a, '1'), attr);
       frameStamp = attr;
       const { root: pierced } = (await client.send('DOM.getDocument', { depth: -1, pierce: true })) as any;

@@ -2,9 +2,10 @@
 // snippet (src/pw-mcp.ts) into one function expression for `browser_run_code_unsafe`.
 import { execFileSync } from 'node:child_process';
 import { readFileSync, rmSync, writeFileSync, chmodSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 import { build } from 'esbuild';
 
-const root = new URL('..', import.meta.url).pathname;
+const root = fileURLToPath(new URL('..', import.meta.url));
 const pkg = JSON.parse(readFileSync(root + 'package.json', 'utf8'));
 
 rmSync(root + 'dist', { recursive: true, force: true });

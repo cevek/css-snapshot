@@ -52,9 +52,31 @@ if (dryRun) {
   process.exit(0);
 }
 
-step(`version ${bump}`, 'npm', 'version', bump, '-m', 'Release %s');
+// Publish BEFORE committing or tagging: a rejected publish (rights, OTP) then rolls back
+// to the clean tree it started from, and the same command can simply be re-run.
+step(`version ${bump} (package.json only)`, 'npm', 'version', bump, '--no-git-tag-version');
 const { version } = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8'));
-step('npm publish', 'npm', 'publish', '--access', 'public');
-step('push commit + tag', 'git', 'push', '--follow-tags', 'origin', 'main');
-step('GitHub release', 'gh', 'release', 'create', `v${version}`, '--title', `v${version}`, '--generate-notes', '--verify-tag');
+try {
+  console.log(`\n▸ npm publish ${version}`);
+  execFileSync('npm', ['publish', '--access', 'public'], { stdio: 'inherit' });
+} catch {
+  execFileSync('git', ['checkout', '--', 'package.json', 'package-lock.json']);
+  fail(`npm publish failed — version bump rolled back, nothing was released; re-run when fixed`);
+}
+// Published: from here a failure is finished by hand, never by re-running (that would bump again).
+const finish = (title, cmd, ...a) => {
+  console.log(`\n▸ ${title}`);
+  try {
+    execFileSync(cmd, a, { stdio: 'inherit' });
+  } catch {
+    fail(`css-snapshot@${version} IS PUBLISHED, but "${title}" failed. Do NOT re-run release; finish by hand:\n`
+      + `  git commit -am "Release ${version}" && git tag v${version}   (if not done)\n`
+      + `  git push --follow-tags origin main\n`
+      + `  gh release create v${version} --title v${version} --generate-notes --verify-tag`);
+  }
+};
+finish('commit', 'git', 'commit', '-am', `Release ${version}`);
+finish('tag', 'git', 'tag', '-a', `v${version}`, '-m', `v${version}`);
+finish('push commit + tag', 'git', 'push', '--follow-tags', 'origin', 'main');
+finish('GitHub release', 'gh', 'release', 'create', `v${version}`, '--title', `v${version}`, '--generate-notes', '--verify-tag');
 console.log(`\nrelease: css-snapshot@${version} is out — https://www.npmjs.com/package/css-snapshot`);

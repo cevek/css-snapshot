@@ -3,7 +3,7 @@
 // computed value of the reworked document, with an original-side sanity anchor.
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import { chromium, type Browser } from 'playwright';
-import { reworkHtml, reworkStyles, jsonToHtml } from '../src/extract.ts';
+import { reworkHtml, reworkStyles, jsonToHtml, matcherMode } from '../src/extract.ts';
 
 let browser: Browser;
 beforeAll(async () => { browser = await chromium.launch(); });
@@ -178,7 +178,7 @@ describe('corpus regressions', () => {
   // lost before simplifyCalc ever runs — unrecoverable on that path (§10
   // representation class). The probe path reduces the AUTHORED text at
   // precision 12 and must stay exact.
-  it.skipIf(process.env.CSS_DIFF_MATCHER === 'cdp')('a unitless line-height division keeps browser precision (t-tapdjv)', async () => {
+  it.skipIf(matcherMode() === 'cdp')('a unitless line-height division keeps browser precision (t-tapdjv)', async () => {
     // Tailwind text-xs: line-height calc(1/0.75) on font-size 12px must render
     // a 16px line box, not floor a LayoutUnit down to 15.9844px.
     const body = `<!doctype html><html><head><style>

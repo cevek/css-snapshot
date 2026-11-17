@@ -40,7 +40,7 @@ let context: BrowserContext;
 let conn: CdpConnection;
 
 beforeAll(async () => {
-  udd = await mkdtemp(join(tmpdir(), 'cssdiff-adapter-'));
+  udd = await mkdtemp(join(tmpdir(), 'css-snapshot-adapter-'));
   context = await chromium.launchPersistentContext(udd, { args: ['--remote-debugging-port=0'] });
   const [port, path] = (await readFile(join(udd, 'DevToolsActivePort'), 'utf8')).split('\n');
   conn = await CdpConnection.connect(`ws://127.0.0.1:${port}${path}`);

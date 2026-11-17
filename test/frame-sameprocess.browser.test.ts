@@ -19,7 +19,7 @@ import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import http from 'node:http';
 import type { AddressInfo } from 'node:net';
 import { chromium, type Browser, type BrowserContext, type Frame, type Page } from 'playwright';
-import { reworkStyles } from '../src/extract.ts';
+import { reworkStyles, FRAME_STAMP_PREFIX } from '../src/extract.ts';
 import { canonicalStyleJson } from '../src/diff.ts';
 
 const MARKER = 'data-cssdiff-root';
@@ -140,8 +140,10 @@ describe('reworkStyles({ frame }) — same-process (same-site) iframe extraction
     await page.close();
 
     const hasStamp = (n: { attrs?: Record<string, string>; children?: unknown[] }): boolean =>
-      Object.keys(n.attrs || {}).some((k) => k.startsWith('data-cssdiff-frame-')) ||
+      Object.keys(n.attrs || {}).some((k) => k.startsWith(FRAME_STAMP_PREFIX)) ||
       (n.children || []).some((c) => hasStamp(c as typeof n));
+    // The detector sees a stamp where there is one.
+    expect(hasStamp({ children: [{ attrs: { [`${FRAME_STAMP_PREFIX}1`]: '1' } }] })).toBe(true);
     expect(hasStamp(json.tree)).toBe(false);
   });
 });

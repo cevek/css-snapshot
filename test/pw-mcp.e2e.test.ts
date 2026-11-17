@@ -5,6 +5,7 @@ import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import { mkdtempSync, readFileSync, copyFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js';
 import { chromium, type Browser } from 'playwright';
@@ -13,7 +14,7 @@ import { pwMcpLoader } from '../src/pw-mcp-loader.ts';
 import type { SelfContainedStyles } from '../src/extract.ts';
 import { servePages } from './util/server.ts';
 
-const root = new URL('..', import.meta.url).pathname;
+const root = fileURLToPath(new URL('..', import.meta.url));
 const bundle = join(root, 'dist/pw-mcp.js');
 
 // Authored `padding:0 4px` and `margin:0` survive verbatim on the probe path; the CDP
