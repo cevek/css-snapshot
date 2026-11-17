@@ -1,6 +1,6 @@
 {
   "name": "css-snapshot",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Snapshot the resolved, de-noised CSS of a live Chromium page (or one element) as one self-contained JSON that rebuilds the render offline. Uses the browser's own cascade engine over CDP.",
   "keywords": [
     "css",
