@@ -154,4 +154,24 @@ describe('emission order (cascade) renders a partially-beaten shorthand correctl
     } finally { await p.close(); }
     expect(bucketsOutOfEmitOrder(json.elements)).toEqual([]);
   });
+
+  // A shorthand that BEATS a co-declared longhand of the same family: a bucket keeping
+  // both (Pass 6b not dropping the dead longhand) is exactly what the guard flags.
+  it('a longhand the shorthand beats is dropped, so the guard stays quiet', async () => {
+    expect(bucketsOutOfEmitOrder({ x: { base: { 'background-color': 'blue', background: 'red' } } }), 'detector')
+      .toEqual(['x.base: background-color under background']);
+    const p = await browser.newPage();
+    let json;
+    try {
+      await p.setContent(
+        `<!doctype html><html><head><style>.box{background-color:blue;list-style-type:square}`
+        + `.box.on{background:red;list-style:none}</style></head>`
+        + `<body><div id="b" class="box on">x</div></body></html>`,
+        { waitUntil: 'load' },
+      );
+      json = await reworkStyles(p);
+    } finally { await p.close(); }
+    expect(json.elements.b?.base?.background, 'the winning shorthand is there').toBeTruthy();
+    expect(bucketsOutOfEmitOrder(json.elements)).toEqual([]);
+  });
 });
