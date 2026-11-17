@@ -1,7 +1,7 @@
 ---
 id: t-4rypa1
 title: 'css-snapshot: standalone package for resolved-CSS snapshot extraction'
-status: in-progress
+status: done
 priority: high
 assigned_to_session: s-3jptme
 author: mb-07ba7304
